@@ -3,7 +3,6 @@ import { formatDate } from '@/lib/utils'
 import Link from 'next/link'
 import type { Song } from '@/types/database'
 import { UserMenu } from '@/components/UserMenu'
-import { Clock } from '@/components/Clock'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,10 +84,7 @@ export default async function HomePage() {
             每日好歌
           </span>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Clock />
-          <UserMenu initialUser={user as any} />
-        </div>
+        <UserMenu initialUser={user as any} />
       </nav>
 
       {/* 今日/最新推荐 */}
