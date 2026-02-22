@@ -40,11 +40,11 @@ export default async function SongPage({ params }: SongPageProps) {
     .eq('song_id', song.id)
     .order('created_at', { ascending: false })
 
-  // 获取评分用户信息
+  // 获取评分用户信息（包含头像）
   const userIds = Array.from(new Set((ratings || []).map(r => r.user_id)))
   const { data: ratingProfiles } = userIds.length > 0 ? await supabase
     .from('profiles')
-    .select('id, display_name')
+    .select('id, display_name, avatar_url')
     .in('id', userIds) : { data: [] }
 
   // 合并评分和用户信息
@@ -72,11 +72,11 @@ export default async function SongPage({ params }: SongPageProps) {
     .eq('song_id', song.id)
     .order('created_at', { ascending: false })
 
-  // 获取评论用户信息
+  // 获取评论用户信息（包含头像）
   const commentUserIds = Array.from(new Set((commentsData || []).map(c => c.user_id)))
   const { data: commentProfiles } = commentUserIds.length > 0 ? await supabase
     .from('profiles')
-    .select('id, display_name')
+    .select('id, display_name, avatar_url')
     .in('id', commentUserIds) : { data: [] }
 
   // 合并评论和用户信息

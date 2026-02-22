@@ -58,10 +58,10 @@ export function RatingComponent({
       if (error) throw error
 
       if (newRating) {
-        // 获取当前用户的 profile 信息
+        // 获取当前用户的 profile 信息（包含头像）
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id, display_name')
+          .select('id, display_name, avatar_url')
           .eq('id', user.id)
           .single()
 

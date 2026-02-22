@@ -6,6 +6,7 @@ import Link from 'next/link'
 import type { User } from '@supabase/supabase-js'
 import type { Comment, Profile } from '@/types/database'
 import { formatTime } from '@/lib/utils'
+import { Avatar } from './Avatar'
 
 interface CommentWithProfile extends Comment {
   profiles?: Profile
@@ -58,10 +59,10 @@ export function CommentComponent({
       if (error) throw error
 
       if (newCommentData) {
-        // 获取当前用户的 profile 信息
+        // 获取当前用户的 profile 信息（包含头像）
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id, display_name')
+          .select('id, display_name, avatar_url')
           .eq('id', user.id)
           .single()
 
@@ -101,23 +102,6 @@ export function CommentComponent({
       console.error('删除评论失败:', error)
       alert('删除失败，请重试')
     }
-  }
-
-  // 生成头像颜色
-  const getAvatarColor = (name: string) => {
-    const colors = [
-      'linear-gradient(135deg, #8b5cf6, #a78bfa)',
-      'linear-gradient(135deg, #ec4899, #f472b6)',
-      'linear-gradient(135deg, #06b6d4, #67e8f9)',
-      'linear-gradient(135deg, #10b981, #34d399)',
-      'linear-gradient(135deg, #f59e0b, #fbbf24)',
-      'linear-gradient(135deg, #ef4444, #f87171)',
-    ]
-    let hash = 0
-    for (let i = 0; i < name.length; i++) {
-      hash = name.charCodeAt(i) + ((hash << 5) - hash)
-    }
-    return colors[Math.abs(hash) % colors.length]
   }
 
   return (
@@ -289,23 +273,12 @@ export function CommentComponent({
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   {/* 头像 */}
-                  <div
-                    style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '50%',
-                      background: getAvatarColor(comment.profiles?.display_name || '用户'),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: 'white',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {(comment.profiles?.display_name || '用户').charAt(0).toUpperCase()}
-                  </div>
+                  <Avatar
+                    url={comment.profiles?.avatar_url}
+                    name={comment.profiles?.display_name || '用户'}
+                    size={40}
+                    fontSize={16}
+                  />
                   <div>
                     <div
                       style={{

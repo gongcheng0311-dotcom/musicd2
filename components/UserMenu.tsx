@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { presetAvatars, isPresetAvatar, getPresetAvatarId } from '@/lib/avatars'
 
 interface UserMenuProps {
   initialUser: {
@@ -15,9 +16,29 @@ interface UserMenuProps {
 
 export function UserMenu({ initialUser }: UserMenuProps) {
   const [user, setUser] = useState(initialUser)
+  const [profile, setProfile] = useState<{ display_name?: string; avatar_url?: string } | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+
+  // 获取用户资料
+  useEffect(() => {
+    if (!user) return
+
+    const fetchProfile = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('display_name, avatar_url')
+        .eq('id', user.id)
+        .single()
+
+      if (data) {
+        setProfile(data)
+      }
+    }
+
+    fetchProfile()
+  }, [user, supabase])
 
   // 监听认证状态变化
   useEffect(() => {
@@ -26,6 +47,7 @@ export function UserMenu({ initialUser }: UserMenuProps) {
         setUser(session.user as any)
       } else {
         setUser(null)
+        setProfile(null)
       }
     })
 
@@ -41,7 +63,73 @@ export function UserMenu({ initialUser }: UserMenuProps) {
     router.refresh()
   }
 
-  // 生成头像颜色
+  // 获取显示名称
+  const displayName = profile?.display_name || user?.user_metadata?.display_name || user?.email?.split('@')[0] || '用户'
+
+  // 渲染头像
+  const renderAvatar = (size: number = 28, fontSize: number = 12) => {
+    const avatarUrl = profile?.avatar_url
+
+    // 检查是否是预设头像
+    if (avatarUrl) {
+      const presetId = getPresetAvatarId(avatarUrl)
+      if (presetId) {
+        const preset = presetAvatars.find(a => a.id === presetId)
+        if (preset) {
+          return (
+            <div style={{
+              width: size,
+              height: size,
+              borderRadius: '50%',
+              background: preset.bg,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: size * 0.5,
+            }}>
+              {preset.emoji}
+            </div>
+          )
+        }
+      }
+
+      // 自定义上传头像
+      return (
+        <img
+          src={avatarUrl}
+          alt={displayName}
+          style={{
+            width: size,
+            height: size,
+            borderRadius: '50%',
+            objectFit: 'cover',
+          }}
+        />
+      )
+    }
+
+    // 默认头像（字母）
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          background: getAvatarColor(displayName),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: fontSize,
+          fontWeight: 600,
+        }}
+      >
+        {displayName.charAt(0).toUpperCase()}
+      </div>
+    )
+  }
+
+  // 生成头像颜色（用于默认头像）
   const getAvatarColor = (name: string) => {
     const colors = [
       'linear-gradient(135deg, #8b5cf6, #a78bfa)',
@@ -81,8 +169,6 @@ export function UserMenu({ initialUser }: UserMenuProps) {
     )
   }
 
-  const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || '用户'
-
   return (
     <div style={{ position: 'relative' }}>
       <button
@@ -112,22 +198,7 @@ export function UserMenu({ initialUser }: UserMenuProps) {
         >
           {displayName}
         </span>
-        <div
-          style={{
-            width: '28px',
-            height: '28px',
-            borderRadius: '50%',
-            background: getAvatarColor(displayName),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '12px',
-            fontWeight: 600,
-          }}
-        >
-          {displayName.charAt(0).toUpperCase()}
-        </div>
+        {renderAvatar(28, 12)}
       </button>
 
       {isOpen && (
@@ -154,55 +225,56 @@ export function UserMenu({ initialUser }: UserMenuProps) {
               borderRadius: 'var(--radius-lg)',
               border: '1px solid var(--border-primary)',
               boxShadow: 'var(--shadow-xl)',
-              minWidth: '200px',
+              minWidth: '220px',
               zIndex: 50,
               overflow: 'hidden',
             }}
           >
             <div
               style={{
-                padding: '16px',
+                padding: '20px',
                 borderBottom: '1px solid var(--border-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '14px',
               }}
             >
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  background: getAvatarColor(displayName),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '20px',
-                  fontWeight: 600,
-                  marginBottom: '12px',
-                }}
-              >
-                {displayName.charAt(0).toUpperCase()}
-              </div>
-              <div
-                style={{
-                  fontWeight: 600,
-                  fontSize: '14px',
-                  marginBottom: '4px',
-                }}
-              >
-                {displayName}
-              </div>
-              <div
-                style={{
-                  fontSize: '13px',
-                  color: 'var(--text-tertiary)',
-                }}
-              >
-                {user.email}
+              {renderAvatar(48, 20)}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    marginBottom: '2px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {displayName}
+                </div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: 'var(--text-tertiary)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {user.email}
+                </div>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
+
+            {/* 编辑资料按钮 */}
+            <Link
+              href="/profile"
+              onClick={() => setIsOpen(false)}
               style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
                 width: '100%',
                 padding: '12px 16px',
                 textAlign: 'left',
@@ -210,11 +282,46 @@ export function UserMenu({ initialUser }: UserMenuProps) {
                 backgroundColor: 'transparent',
                 fontSize: '14px',
                 cursor: 'pointer',
+                color: 'var(--text-primary)',
+                textDecoration: 'none',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--surface-secondary)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              编辑资料
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                textAlign: 'left',
+                border: 'none',
+                borderTop: '1px solid var(--border-secondary)',
+                backgroundColor: 'transparent',
+                fontSize: '14px',
+                cursor: 'pointer',
                 color: '#fca5a5',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '12px',
                 transition: 'background-color 0.2s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent'
               }}
             >
               <svg

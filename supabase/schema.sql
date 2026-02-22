@@ -11,6 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     display_name TEXT,
+    avatar_url TEXT,
     is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -57,6 +58,11 @@ CREATE POLICY "用户只能更新自己的 profile"
     ON profiles FOR UPDATE
     TO authenticated
     USING (id = auth.uid())
+    WITH CHECK (id = auth.uid());
+
+CREATE POLICY "用户可以插入自己的 profile"
+    ON profiles FOR INSERT
+    TO authenticated
     WITH CHECK (id = auth.uid());
 
 -- ============================================
