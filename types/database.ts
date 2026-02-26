@@ -6,6 +6,7 @@ export interface Song {
   title: string
   artist: string
   album: string | null
+  style: string | null
   cover_url: string | null
   description: string | null
   lyrics: string | null

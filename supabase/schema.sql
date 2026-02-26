@@ -74,6 +74,7 @@ CREATE TABLE songs (
     title TEXT NOT NULL,
     artist TEXT NOT NULL,
     album TEXT,
+    style TEXT, -- 歌曲风格（如：流行、摇滚、电子等，10-20字）
     cover_url TEXT,
     description TEXT,
     lyrics TEXT,

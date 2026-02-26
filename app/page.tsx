@@ -191,6 +191,25 @@ export default async function HomePage() {
                   {targetSong.artist}
                 </p>
 
+                {targetSong.style && (
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      padding: '4px 12px',
+                      background: 'var(--bg-glass)',
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: 'var(--radius-full)',
+                      fontSize: '13px',
+                      color: 'var(--primary-400)',
+                      fontWeight: 500,
+                      marginBottom: '12px',
+                      letterSpacing: '0.02em',
+                    }}
+                  >
+                    {targetSong.style}
+                  </span>
+                )}
+
                 {targetSong.album && (
                   <p
                     style={{
