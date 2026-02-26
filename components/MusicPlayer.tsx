@@ -7,18 +7,23 @@ interface MusicPlayerProps {
   qqMusicUrl: string | null
   qqMusicId: string | null
   bilibiliBvid: string | null
+  appleMusicUrl: string | null
 }
 
-export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayerProps) {
+export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid, appleMusicUrl }: MusicPlayerProps) {
   const [qqEmbedError, setQqEmbedError] = useState(false)
-  const [activeTab, setActiveTab] = useState<'qq' | 'bilibili'>('qq')
+  const [activeTab, setActiveTab] = useState<'qq' | 'bilibili' | 'apple'>('qq')
 
-  // 如果有 B 站视频，优先显示 B 站（因为 embed 更稳定）
+  // 自动选择默认 Tab：优先 B 站（embed 稳定），然后是 QQ 音乐，最后是 Apple Music
   useEffect(() => {
-    if (bilibiliBvid && !qqMusicId) {
+    if (bilibiliBvid) {
       setActiveTab('bilibili')
+    } else if (qqMusicId || qqMusicUrl) {
+      setActiveTab('qq')
+    } else if (appleMusicUrl) {
+      setActiveTab('apple')
     }
-  }, [bilibiliBvid, qqMusicId])
+  }, [bilibiliBvid, qqMusicId, qqMusicUrl, appleMusicUrl])
 
   // 构建 Bilibili 嵌入链接
   const getBilibiliEmbedUrl = (bvid: string): string => {
@@ -27,8 +32,9 @@ export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayer
 
   const hasQQMusic = qqMusicUrl || qqMusicId
   const hasBilibili = !!bilibiliBvid
+  const hasAppleMusic = !!appleMusicUrl
 
-  if (!hasQQMusic && !hasBilibili) {
+  if (!hasQQMusic && !hasBilibili && !hasAppleMusic) {
     return null
   }
 
@@ -61,7 +67,7 @@ export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayer
       </div>
 
       {/* Tab 切换 */}
-      {(hasQQMusic && hasBilibili) && (
+      {(hasQQMusic || hasBilibili || hasAppleMusic) && (
         <div
           style={{
             display: 'flex',
@@ -71,6 +77,7 @@ export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayer
             background: 'var(--bg-tertiary)',
             borderRadius: 'var(--radius-md)',
             width: 'fit-content',
+            flexWrap: 'wrap',
           }}
         >
           {hasQQMusic && (
@@ -93,6 +100,29 @@ export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayer
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
                 QQ 音乐
+              </span>
+            </button>
+          )}
+          {hasAppleMusic && (
+            <button
+              onClick={() => setActiveTab('apple')}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-sm)',
+                border: 'none',
+                backgroundColor: activeTab === 'apple' ? '#fc3c44' : 'transparent',
+                color: activeTab === 'apple' ? 'white' : 'var(--text-tertiary)',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: 500,
+                transition: 'all 0.2s',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-7c0-.28.22-.5.5-.5s.5.22.5.5v7zm3 0c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-7c0-.28.22-.5.5-.5s.5.22.5.5v7z"/>
+                </svg>
+                Apple Music
               </span>
             </button>
           )}
@@ -123,7 +153,7 @@ export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayer
       )}
 
       {/* QQ 音乐播放器 */}
-      {(activeTab === 'qq' || !hasBilibili) && hasQQMusic && (
+      {activeTab === 'qq' && hasQQMusic && (
         <div>
           {qqMusicId && !qqEmbedError ? (
             <div>
@@ -191,8 +221,45 @@ export function MusicPlayer({ qqMusicUrl, qqMusicId, bilibiliBvid }: MusicPlayer
         </div>
       )}
 
+      {/* Apple Music 播放器 */}
+      {activeTab === 'apple' && hasAppleMusic && (
+        <div>
+          <div
+            style={{
+              padding: '48px 32px',
+              textAlign: 'center',
+              background: 'var(--bg-glass)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px dashed var(--border-primary)',
+            }}
+          >
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎵</div>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '15px' }}>
+              Apple Music 需要跳转应用或网页播放<br />点击下方按钮在新窗口打开
+            </p>
+            <a
+              href={appleMusicUrl!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '10px',
+                background: '#fc3c44',
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-7c0-.28.22-.5.5-.5s.5.22.5.5v7zm3 0c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-7c0-.28.22-.5.5-.5s.5.22.5.5v7z"/>
+              </svg>
+              在 Apple Music 播放
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Bilibili 播放器 */}
-      {(activeTab === 'bilibili' || !hasQQMusic) && hasBilibili && bilibiliBvid && (
+      {activeTab === 'bilibili' && hasBilibili && bilibiliBvid && (
         <div>
           <div
             style={{

@@ -319,6 +319,7 @@ export default async function SongPage({ params }: SongPageProps) {
         qqMusicUrl={song.qq_music_url}
         qqMusicId={song.qq_music_id}
         bilibiliBvid={song.bilibili_bvid}
+        appleMusicUrl={song.apple_music_url}
       />
 
       {/* 简介 */}

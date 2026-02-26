@@ -12,6 +12,7 @@ export interface Song {
   qq_music_url: string | null
   qq_music_id: string | null
   bilibili_bvid: string | null
+  apple_music_url: string | null
   created_at: string
   updated_at: string
 }

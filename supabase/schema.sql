@@ -80,6 +80,7 @@ CREATE TABLE songs (
     qq_music_url TEXT,
     qq_music_id TEXT, -- 用于嵌入播放器
     bilibili_bvid TEXT, -- B站 BV号
+    apple_music_url TEXT, -- Apple Music 链接
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
