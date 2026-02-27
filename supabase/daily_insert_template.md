@@ -10,9 +10,10 @@ INSERT INTO songs (
     title,
     artist,
     album,
-    style,           -- 新增：歌曲风格（10-20字）
+    style,           -- 歌曲风格（10-20字）
     cover_url,
-    description,
+    intro,           -- 歌曲简介（首页显示，50-100字）
+    description,     -- 歌曲介绍（详情页显示，可较长）
     lyrics,
     qq_music_url,
     qq_music_id,
@@ -25,7 +26,8 @@ INSERT INTO songs (
     '专辑名称',                             -- 可选，没有则填 NULL
     '华语流行 · 抒情',                       -- 风格标签（建议10-20字）
     'https://example.com/cover.jpg',        -- 专辑封面URL
-    '这首歌的推荐语或简介...',              -- 推荐语（可选）
+    '首页显示的简短介绍，50-100字左右...',   -- 歌曲简介（可选，首页显示）
+    '详情页的完整歌曲介绍，可以写得更详细...', -- 歌曲介绍（可选，详情页显示）
     '歌词内容...',                          -- 歌词（可选）
     'https://y.qq.com/n/ryqq/songDetail/xxx', -- QQ音乐链接（可选）
     '001xxx',                               -- QQ音乐ID（可选）
@@ -46,6 +48,7 @@ INSERT INTO songs (
     album,
     style,
     cover_url,
+    intro,
     description,
     qq_music_url,
     bilibili_bvid
@@ -56,7 +59,8 @@ INSERT INTO songs (
     '叶惠美',
     '华语流行 · 校园怀旧',
     'https://y.qq.com/music/photo/xxx.jpg',
-    '从前从前有个人爱你很久，偏偏风渐渐把距离吹得好远',
+    '一首关于青春与回忆的经典之作，旋律优美动人，让人想起那些美好的校园时光。',  -- 首页简介（简短）
+    '《晴天》是周杰伦演唱的歌曲，由周杰伦作词、作曲，收录于2003年发行的专辑《叶惠美》中。这首歌以吉他为主旋律，讲述了一段青涩的校园爱情故事，旋律优美，歌词真挚，是许多人青春回忆的代表作。',  -- 详情页介绍（详细）
     'https://y.qq.com/n/ryqq/songDetail/000xxx',
     'BV1xxx'
 );
@@ -120,9 +124,10 @@ VALUES (
 | `title` | ✅ | 歌曲名称 | '晴天' |
 | `artist` | ✅ | 歌手/艺人 | '周杰伦' |
 | `album` | ❌ | 专辑名称 | '叶惠美' |
-| **style** | ❌ | **风格标签（新增）** | '华语流行 · 校园怀旧' |
+| `style` | ❌ | 风格标签（10-20字） | '华语流行 · 校园怀旧' |
 | `cover_url` | ❌ | 专辑封面图片URL | 'https://...' |
-| `description` | ❌ | 推荐语/简介 | 纯文本 |
+| **intro** | ❌ | **歌曲简介（首页显示）** | 简短描述，50-100字 |
+| **description** | ❌ | **歌曲介绍（详情页显示）** | 详细介绍，可较长 |
 | `lyrics` | ❌ | 完整歌词 | 纯文本 |
 | `qq_music_url` | ❌ | QQ音乐链接 | 网页链接 |
 | `qq_music_id` | ❌ | QQ音乐ID | '000xxx' |
@@ -134,6 +139,9 @@ VALUES (
 ## 提示
 
 - `style` 字段建议 **10-20字**，太短信息不足，太长显示不下
+- `intro`（歌曲简介）用于首页显示，建议 **50-100字**，简洁吸引人
+- `description`（歌曲介绍）用于详情页，可以写得详细一些，无字数限制
 - 可以用 `·` 或 `/` 分隔多个标签
 - 日期必须唯一，每天只能有一首推荐歌曲
 - 封面图建议使用正方形图片（400x400px以上）
+- 如果只有 `description` 没有 `intro`，首页将不显示简介部分

@@ -8,6 +8,7 @@ export interface Song {
   album: string | null
   style: string | null
   cover_url: string | null
+  intro: string | null
   description: string | null
   lyrics: string | null
   qq_music_url: string | null

@@ -340,7 +340,7 @@ export default async function SongPage({ params }: SongPageProps) {
             >
               📝
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600 }}>歌曲简介</h3>
+            <h3 style={{ fontSize: '18px', fontWeight: 600 }}>歌曲介绍</h3>
           </div>
           <p
             style={{

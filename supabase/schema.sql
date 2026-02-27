@@ -76,7 +76,8 @@ CREATE TABLE songs (
     album TEXT,
     style TEXT, -- 歌曲风格（如：流行、摇滚、电子等，10-20字）
     cover_url TEXT,
-    description TEXT,
+    intro TEXT, -- 歌曲简介（首页显示，50-100字）
+    description TEXT, -- 歌曲介绍（详情页显示，可较长）
     lyrics TEXT,
     qq_music_url TEXT,
     qq_music_id TEXT, -- 用于嵌入播放器

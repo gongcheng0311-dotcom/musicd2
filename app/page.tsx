@@ -222,7 +222,7 @@ export default async function HomePage() {
                   </p>
                 )}
 
-                {targetSong.description && (
+                {targetSong.intro && (
                   <p
                     style={{
                       fontSize: '16px',
@@ -231,7 +231,7 @@ export default async function HomePage() {
                       marginBottom: '32px',
                     }}
                   >
-                    {targetSong.description}
+                    {targetSong.intro}
                   </p>
                 )}
 
