@@ -6,6 +6,7 @@ import { RatingComponent } from '@/components/RatingComponent'
 import { CommentComponent } from '@/components/CommentComponent'
 import { MusicPlayer } from '@/components/MusicPlayer'
 import { UserMenu } from '@/components/UserMenu'
+import { SongStoryGenerator } from '@/components/SongStoryGenerator'
 
 interface SongPageProps {
   params: { date: string }
@@ -323,25 +324,25 @@ export default async function SongPage({ params }: SongPageProps) {
       />
 
       {/* 简介 */}
-      {song.description && (
-        <section className="card" style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '12px',
-                background: 'var(--gradient-secondary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
-              }}
-            >
-              📝
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 600 }}>歌曲介绍</h3>
+      <section className="card" style={{ marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              background: 'var(--gradient-secondary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+            }}
+          >
+            📝
           </div>
+          <h3 style={{ fontSize: '18px', fontWeight: 600 }}>歌曲介绍</h3>
+        </div>
+        {song.description ? (
           <p
             style={{
               lineHeight: 1.8,
@@ -352,8 +353,13 @@ export default async function SongPage({ params }: SongPageProps) {
           >
             {song.description}
           </p>
-        </section>
-      )}
+        ) : (
+          <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
+            暂无歌曲介绍
+          </p>
+        )}
+        <SongStoryGenerator song={song} />
+      </section>
 
       {/* 歌词 */}
       {song.lyrics && (
